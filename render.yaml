@@ -1,0 +1,27 @@
+services:
+  # Backend API Service
+  - type: web
+    name: healthsync-backend
+    env: node
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false # You'll set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false # You'll set this in Render dashboard
+    healthCheckPath: /api/health
+
+  # Frontend Static Site
+  - type: web
+    name: healthsync-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./out
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://healthsync-backend.onrender.com

@@ -194,7 +194,7 @@ export default function DoctorDashboard() {
           <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }}>
             <Card className="transition-all duration-300 hover:border-2 hover:border-gray-300 hover:shadow-lg bg-white">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-700">Today's Schedule</CardTitle>
+                <CardTitle className="text-lg font-semibold text-gray-700">Today&apos;s Schedule</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">

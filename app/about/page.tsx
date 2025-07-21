@@ -87,7 +87,7 @@ export default function About() {
             whileHover="hover"
           >
             <p className="text-gray-700 leading-relaxed">
-              At HealthSync, we're committed to revolutionizing healthcare management through innovative technology. 
+              At HealthSync, we&apos;re committed to revolutionizing healthcare management through innovative technology.
               Our goal is to empower individuals to take control of their health by providing intuitive tools and 
               AI-driven insights, all while ensuring the highest standards of data security and privacy.
             </p>
