@@ -144,12 +144,15 @@ export default function AdminLogin() {
               <p className="text-sm text-gray-400">
                 Demo Credentials: admin@healthsync.com / admin123
               </p>
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200"
               >
                 ← Back to Home
               </Link>
+              <p className="text-xs text-gray-500 mt-2">
+                Direct access: /admin
+              </p>
             </div>
           </CardContent>
         </Card>

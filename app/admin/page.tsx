@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -15,7 +16,8 @@ import {
   Shield,
   BarChart3,
   Activity,
-  TrendingUp
+  TrendingUp,
+  LogOut
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -103,15 +105,64 @@ const quickStats = [
 ]
 
 export default function AdminDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('userRole')
+    router.push('/admin/login')
+  }
+
+  useEffect(() => {
+    // Check if user is authenticated (in production, verify JWT token)
+    const adminToken = localStorage.getItem('adminToken')
+    const userRole = localStorage.getItem('userRole')
+
+    if (adminToken && userRole === 'admin') {
+      setIsAuthenticated(true)
+    } else {
+      router.push('/admin/login')
+    }
+    setIsLoading(false)
+  }, [router])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null // Will redirect to login
+  }
+
   return (
     <div className="p-6 space-y-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="flex justify-between items-center"
       >
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">Welcome to the HealthSync administration portal</p>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600">Welcome to the HealthSync administration portal</p>
+        </div>
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="flex items-center gap-2 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </Button>
       </motion.div>
 
       {/* Quick Stats */}
