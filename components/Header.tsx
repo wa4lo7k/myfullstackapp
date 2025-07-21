@@ -115,6 +115,11 @@ export default function Header() {
                       isScrolled ? 'text-gray-300' : 'text-white'
                     }`}>Register</Link>
                   </motion.li>
+                  <motion.li whileHover="hover" variants={linkVariants}>
+                    <Link href="/admin-access" className={`hover:text-orange-400 transition-colors duration-300 ${
+                      isScrolled ? 'text-gray-300' : 'text-white'
+                    } text-sm font-medium`}>Admin Portal</Link>
+                  </motion.li>
                 </>
               )}
             </ul>
@@ -160,6 +165,7 @@ export default function Header() {
                 <li><Link href="/features" className="block py-2 text-gray-300 hover:text-blue-400 text-lg">Features</Link></li>
                 <li><Link href="/login" className="block py-2 text-gray-300 hover:text-blue-400 text-lg">Login</Link></li>
                 <li><Link href="/register" className="block py-2 text-gray-300 hover:text-blue-400 text-lg">Register</Link></li>
+                <li><Link href="/admin-access" className="block py-2 text-orange-300 hover:text-orange-400 text-lg font-medium">Admin Portal</Link></li>
               </>
             )}
           </ul>
