@@ -1,26 +1,30 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
+// Test setup for PostgreSQL-based HealthSync backend
+// For now, we'll use mocked database operations
 
-jest.setTimeout(120000); // 2 minutes for all tests
+jest.setTimeout(30000); // 30 seconds for all tests
 
-let mongoServer: MongoMemoryServer;
+// Mock the database pool to avoid requiring a real database for tests
+jest.mock('../config/db', () => ({
+  pool: {
+    connect: jest.fn().mockResolvedValue({
+      query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+      release: jest.fn(),
+    }),
+  },
+  default: jest.fn().mockResolvedValue(undefined),
+}));
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri);
+  // Setup test environment
+  process.env.NODE_ENV = 'test';
+  process.env.JWT_SECRET = 'test-secret';
 });
 
 afterEach(async () => {
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    await collections[key].deleteMany({});
-  }
+  // Clear all mocks after each test
+  jest.clearAllMocks();
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  if (mongoServer) {
-    await mongoServer.stop();
-  }
-}); 
+  // Cleanup after all tests
+});

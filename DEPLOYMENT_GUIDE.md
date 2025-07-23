@@ -2,10 +2,10 @@
 
 ## 🚀 Quick Deployment Steps
 
-### 1. Set Up MongoDB Atlas (Free Database)
-1. Go to [MongoDB Atlas](https://cloud.mongodb.com)
-2. Create free account and cluster
-3. Create database user
+### 1. Set Up PostgreSQL Database (Free on Render)
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New +" → "PostgreSQL"
+3. Choose free tier
 4. Get connection string (save for step 3)
 
 ### 2. Deploy Backend on Render
@@ -24,7 +24,7 @@ In Render dashboard, add these environment variables:
 ```
 NODE_ENV=production
 PORT=10000
-MONGODB_URI=your_mongodb_atlas_connection_string
+DATABASE_URL=your_postgresql_connection_string
 JWT_SECRET=your_super_secret_jwt_key_here
 ```
 
@@ -55,13 +55,13 @@ NEXT_PUBLIC_API_URL=https://healthsync-backend.onrender.com
   - Manage environment variables
   - Database connection status
 
-### MongoDB Atlas Dashboard
-- **URL**: `https://cloud.mongodb.com`
+### PostgreSQL Dashboard (Render)
+- **URL**: `https://dashboard.render.com`
 - **Features**:
   - Query and manage data
   - View database metrics
-  - Set up indexes
-  - Monitor performance
+  - Monitor connections
+  - Database logs
 
 ### API Endpoints
 - **Base URL**: `https://healthsync-backend.onrender.com/api`
@@ -92,19 +92,19 @@ curl https://healthsync-frontend.onrender.com
 - Set up alerts for downtime
 
 ## 📊 Free Tier Limits
-- **Render**: 750 hours/month, sleeps after 15min inactivity
-- **MongoDB Atlas**: 512MB storage, shared cluster
+- **Render Web Service**: 750 hours/month, sleeps after 15min inactivity
+- **Render PostgreSQL**: 1GB storage, 1 month retention
 - **Bandwidth**: 100GB/month
 
 ## 🔒 Security Checklist
 - [ ] Strong JWT secret
-- [ ] MongoDB IP whitelist configured
+- [ ] PostgreSQL connection secured
 - [ ] Environment variables set
 - [ ] CORS properly configured
 - [ ] Admin routes secured
 
 ## 🆘 Troubleshooting
 - **Backend won't start**: Check environment variables
-- **Database connection failed**: Verify MongoDB URI
+- **Database connection failed**: Verify DATABASE_URL
 - **Frontend can't reach backend**: Check NEXT_PUBLIC_API_URL
 - **App sleeping**: Upgrade to paid plan or use uptime monitoring

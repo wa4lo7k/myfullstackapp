@@ -1,13 +1,27 @@
 import request from 'supertest';
 import { app } from '../server'; // Adjust path to your Express app
-import User from '../models/User'; // Use default import for User model
+import { User } from '../models/User'; // Use named import for User class
 
 describe('Authentication API', () => {
   beforeEach(async () => {
-    await User.deleteMany({});
+    // Mock database operations for testing
+    jest.clearAllMocks();
   });
 
   it('should register a new user successfully', async () => {
+    // Mock User.findByEmail to return null (user doesn't exist)
+    jest.spyOn(User, 'findByEmail').mockResolvedValue(null);
+    // Mock User.create to return a new user
+    jest.spyOn(User, 'create').mockResolvedValue({
+      id: 1,
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'hashedpassword',
+      role: 'patient',
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
     const response = await request(app)
       .post('/api/auth/register')
       .send({

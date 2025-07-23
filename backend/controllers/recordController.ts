@@ -1,19 +1,27 @@
 import { Request, Response } from 'express';
-import HealthRecord from '../models/HealthRecord';
-import Notification from '../models/Notification';
+import { HealthRecord } from '../models/HealthRecord';
+import { Notification } from '../models/Notification';
 import { io, userSockets } from '../server';
 import { randomBytes, hexlify } from 'ethers';
 
 export const createRecord = async (req: Request, res: Response) => {
   try {
-    const record = new HealthRecord(req.body);
-    await record.save();
+    const { user_id, type, data, date } = req.body;
+    const record = await HealthRecord.create({
+      user_id,
+      type,
+      data,
+      date: date ? new Date(date) : new Date()
+    });
     // Notify patient
-    const userId = record.userId.toString();
     const message = `New test result uploaded: ${record.type}`;
-    const notification = new Notification({ userId, message });
-    await notification.save();
-    const socketId = userSockets.get(userId);
+    const notification = await Notification.create({
+      user_id: record.user_id,
+      message,
+      type: 'health_record',
+      read: false
+    });
+    const socketId = userSockets.get(record.user_id.toString());
     if (socketId) {
       io.to(socketId).emit('notification', { message });
     }
@@ -28,7 +36,7 @@ export const createRecord = async (req: Request, res: Response) => {
 
 export const getRecords = async (req: Request, res: Response) => {
   try {
-    const records = await HealthRecord.find();
+    const records = await HealthRecord.findAll();
     res.json(records);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching records', error });
@@ -37,7 +45,7 @@ export const getRecords = async (req: Request, res: Response) => {
 
 export const getRecordById = async (req: Request, res: Response) => {
   try {
-    const record = await HealthRecord.findById(req.params.id);
+    const record = await HealthRecord.findById(parseInt(req.params.id));
     if (!record) return res.status(404).json({ message: 'Record not found' });
     res.json(record);
   } catch (error) {
@@ -47,7 +55,7 @@ export const getRecordById = async (req: Request, res: Response) => {
 
 export const updateRecord = async (req: Request, res: Response) => {
   try {
-    const record = await HealthRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const record = await HealthRecord.updateById(parseInt(req.params.id), req.body);
     if (!record) return res.status(404).json({ message: 'Record not found' });
     res.json(record);
   } catch (error) {
@@ -57,10 +65,10 @@ export const updateRecord = async (req: Request, res: Response) => {
 
 export const deleteRecord = async (req: Request, res: Response) => {
   try {
-    const record = await HealthRecord.findByIdAndDelete(req.params.id);
-    if (!record) return res.status(404).json({ message: 'Record not found' });
+    const deleted = await HealthRecord.deleteById(parseInt(req.params.id));
+    if (!deleted) return res.status(404).json({ message: 'Record not found' });
     res.json({ message: 'Record deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting record', error });
   }
-}; 
+};

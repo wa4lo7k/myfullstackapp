@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { app, server, io, userSockets } from '../server';
-import User from '../models/User';
-import Appointment from '../models/Appointment';
-import Notification from '../models/Notification';
+import { User } from '../models/User';
+import { Appointment } from '../models/Appointment';
+import { Notification } from '../models/Notification';
 let runningServer: any;
 
 beforeAll((done) => {

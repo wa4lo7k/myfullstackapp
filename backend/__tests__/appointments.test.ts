@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { app } from '../server'; // Adjust path
-import User from '../models/User'; // Use default import for User model
-import Appointment from '../models/Appointment'; // Use default import for Appointment model
+import { User } from '../models/User'; // Use named import for User class
+import { Appointment } from '../models/Appointment'; // Use named import for Appointment class
 
 describe('Appointments API', () => {
   let patientToken: string;

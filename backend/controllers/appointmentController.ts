@@ -1,27 +1,35 @@
 import { Request, Response } from 'express';
-import Appointment from '../models/Appointment';
-import Notification from '../models/Notification';
+import { Appointment } from '../models/Appointment';
+import { Notification } from '../models/Notification';
 import { io, userSockets } from '../server';
 
 export const createAppointment = async (req: Request, res: Response) => {
   try {
-    const { patientId, doctorId, datetime, reason } = req.body;
-    if (!patientId || !doctorId || !datetime || !reason) {
+    const { patient_id, doctor_id, date, notes } = req.body;
+    if (!patient_id || !doctor_id || !date) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    const appointment = new Appointment(req.body);
-    await appointment.save();
+    const appointment = await Appointment.create({
+      patient_id,
+      doctor_id,
+      date: new Date(date),
+      status: 'scheduled',
+      notes
+    });
     // Notify doctor
-    const doctorIdStr = appointment.doctorId.toString();
-    const message = `New appointment scheduled for ${appointment.datetime}`;
-    const notification = new Notification({ userId: doctorIdStr, message });
-    await notification.save();
-    const socketId = userSockets.get(doctorIdStr);
+    const message = `New appointment scheduled for ${appointment.date}`;
+    const notification = await Notification.create({
+      user_id: doctor_id,
+      message,
+      type: 'appointment',
+      read: false
+    });
+    const socketId = userSockets.get(doctor_id.toString());
     if (socketId) {
-      console.log('Emitting notification to socket:', socketId, 'for doctorId:', doctorIdStr);
+      console.log('Emitting notification to socket:', socketId, 'for doctorId:', doctor_id);
       io.to(socketId).emit('notification', {
         type: 'appointment_created',
-        appointmentId: appointment._id,
+        appointmentId: appointment.id,
         message
       });
     }
@@ -34,7 +42,7 @@ export const createAppointment = async (req: Request, res: Response) => {
 
 export const getAppointments = async (req: Request, res: Response) => {
   try {
-    const appointments = await Appointment.find();
+    const appointments = await Appointment.findAll();
     res.status(200).json(appointments);
   } catch (error) {
     console.error('Error in getAppointments:', error);
@@ -44,7 +52,7 @@ export const getAppointments = async (req: Request, res: Response) => {
 
 export const getAppointmentById = async (req: Request, res: Response) => {
   try {
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findById(parseInt(req.params.id));
     if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
     res.json(appointment);
   } catch (error) {
@@ -54,11 +62,16 @@ export const getAppointmentById = async (req: Request, res: Response) => {
 
 export const updateAppointment = async (req: Request, res: Response) => {
   try {
-    const { reason, datetime, status, notes } = req.body;
-    if (!reason && !datetime && !status && !notes) {
+    const { date, status, notes } = req.body;
+    if (!date && !status && !notes) {
       return res.status(400).json({ error: 'No fields to update' });
     }
-    const appointment = await Appointment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updates: any = {};
+    if (date) updates.date = new Date(date);
+    if (status) updates.status = status;
+    if (notes) updates.notes = notes;
+
+    const appointment = await Appointment.updateById(parseInt(req.params.id), updates);
     if (!appointment) return res.status(404).json({ error: 'Appointment not found' });
     res.status(200).json(appointment);
   } catch (error) {
@@ -69,11 +82,11 @@ export const updateAppointment = async (req: Request, res: Response) => {
 
 export const deleteAppointment = async (req: Request, res: Response) => {
   try {
-    const appointment = await Appointment.findByIdAndDelete(req.params.id);
-    if (!appointment) return res.status(404).json({ error: 'Appointment not found' });
+    const deleted = await Appointment.deleteById(parseInt(req.params.id));
+    if (!deleted) return res.status(404).json({ error: 'Appointment not found' });
     res.status(200).json({ message: 'Appointment deleted' });
   } catch (error) {
     console.error('Error in deleteAppointment:', error);
     res.status(500).json({ error: 'Error deleting appointment', details: error });
   }
-}; 
+};
