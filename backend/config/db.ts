@@ -18,7 +18,13 @@ const connectDB = async () => {
     await createTables();
   } catch (error) {
     console.error('PostgreSQL connection failed:', error);
-    process.exit(1);
+    console.log('Running in development mode without database connection');
+    console.log('For full testing, please set up PostgreSQL or use a cloud database');
+
+    // Don't exit in development mode - allow testing without database
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
   }
 };
 

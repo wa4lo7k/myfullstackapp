@@ -26,6 +26,8 @@
     "multer": "^2.0.1",
     "pg": "^8.16.3",
     "socket.io": "^4.8.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

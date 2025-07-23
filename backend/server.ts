@@ -42,7 +42,17 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use(cors());
+// CORS configuration for production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.CORS_ORIGIN || 'https://healthsync-frontend.onrender.com']
+    : ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/appointments', appointmentsRoutes);
@@ -61,7 +71,7 @@ app.get('/', (req, res) => {
 
 if (require.main === module) {
   connectDB();
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 10000;
   server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
